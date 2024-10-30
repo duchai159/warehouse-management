@@ -1,28 +1,25 @@
 <?php
-
-
-
 include("ketnoi.php");
 
-if(isset($_POST["Themkhachhang"]))
-{
-    $ma = $_POST["txtMakhachhang"];
+if (isset($_POST["Themkhachhang"])) {
     $ten = $_POST["txtTenkhachhang"];
     $diachi = $_POST["txtDiachi"];
     $sodienthoai = $_POST["txtSodienthoai"];
 
-  
+    // Sử dụng prepared statements để bảo vệ khỏi SQL injection
+    $sql = "INSERT INTO khachhang (tenkhachhang, diachi, dienthoai) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $ten, $diachi, $sodienthoai);
 
+    if ($stmt->execute()) {
+        echo("<script language='javascript'>alert('Thêm khách hàng thành công');
+        window.location.assign('khachhang.php');
+        </script>");
+    } else {
+        die("Không thể thêm khách hàng: " . $stmt->error);
+    }
 
-    $sql = "INSERT INTO khachhang ( makhachhang,tenkhachhang, diachi, dienthoai)
-            VALUES ('$ma','$ten', '$diachi' ,'$sodienthoai')";
-
-    $kq = $conn->query($sql) or die("Không thể thêm khách hàng: " . $conn->error);
-
-    echo("<script language='javascript'>alert('Thêm khách hàng thành công');
-    window.location.assign('khachhang.php');
-    </script>");
-
+    $stmt->close();
     $conn->close();
 } else {
     echo "Lỗi";

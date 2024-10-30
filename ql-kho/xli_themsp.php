@@ -1,39 +1,40 @@
 <?php
-
-
-
 include("ketnoi.php");
 
-if(isset($_POST["Themsp"]))
-{
+if (isset($_POST["Themsp"])) {
     $ma = $_POST["txtMasanpham"];
     $ten = $_POST["txtTensanpham"];
     $dvt = $_POST["txtdonvitinh"];
-
     $mau = $_POST["txtMau"];
     $loaisanpham = $_POST["txtLoaisanpham"];
     $thuonghieu = $_POST["txtmathuonghieu"];
     $size = $_POST["txtSize"];
-    $hinhanh = isset($_POST["txtHinhAnh"]) ; 
     $gia = $_POST["txtGia"];
 
+    $hinhanh_path = '';
     if (isset($_FILES["txtHinhAnh"]) && $_FILES["txtHinhAnh"]["error"] == 0) {
-        $hinhanh_path = 'uploads/' . $_FILES["txtHinhAnh"]["name"];
-        move_uploaded_file($_FILES["txtHinhAnh"]["tmp_name"], $hinhanh_path);
+        // Kiểm tra loại tệp
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $file_type = $_FILES["txtHinhAnh"]["type"];
+        
+        if (in_array($file_type, $allowed_types)) {
+            $hinhanh_path = 'uploads/' . basename($_FILES["txtHinhAnh"]["name"]);
+            move_uploaded_file($_FILES["txtHinhAnh"]["tmp_name"], $hinhanh_path);
+        } else {
+            die("Tệp không hợp lệ. Vui lòng tải lên hình ảnh JPEG, PNG hoặc GIF.");
+        }
     }
 
+    $stmt = $conn->prepare("INSERT INTO sanpham (masanpham, tensanpham, donvitinh, mausac, loaisanpham, mathuonghieu, kichthuoc, hinhanh, dongia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssss", $ma, $ten, $dvt, $mau, $loaisanpham, $thuonghieu, $size, $hinhanh_path, $gia);
 
+    if ($stmt->execute()) {
+        echo("<script language='javascript'>alert('Thêm sản phẩm thành công'); window.location.assign('sanpham.php');</script>");
+    } else {
+        echo "Không thể thêm sản phẩm mới: " . $stmt->error;
+    }
 
-
-    $sql = "INSERT INTO sanpham ( masanpham, tensanpham,donvitinh, mausac, loaisanpham, mathuonghieu, kichthuoc, hinhanh,dongia)
-            VALUES ('$ma','$ten','$dvt', '$mau','$loaisanpham', '$thuonghieu', '$size','$hinhanh_path','$gia')";
-
-    $kq = $conn->query($sql) or die("Không thể thêm sản phẩm mới: " . $conn->error);
-
-    echo("<script language='javascript'>alert('Thêm sản phẩm thành công');
-    window.location.assign('sanpham.php');
-    </script>");
-
+    $stmt->close();
     $conn->close();
 } else {
     echo "Lỗi";

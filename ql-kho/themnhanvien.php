@@ -1,12 +1,14 @@
 <?php
     include_once("header.php");
+?>
+
+<?php
 session_start();
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "tao token";
 }
 ?>
-
-
 <body>
     <h1 class="tieudeform"> THÊM nhân viên </h1>
 

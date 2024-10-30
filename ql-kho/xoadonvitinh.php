@@ -1,28 +1,56 @@
-
-
 <?php
 include("ketnoi.php");
-$ma=$_REQUEST["mm"];
 
+// Lấy mã đơn vị tính từ yêu cầu
+$ma = $_REQUEST["mm"];
 
-$sql = "SELECT * FROM sanpham WHERE donvitinh='" . $ma . "'";
-
-$result = $conn->query($sql);
-
-if ($result->num_rows>0) 
-{
-    $sql1.= "delete from sanpham where donvitinh='".$ma."';";
-    // $kq = $conn -> query($sql) or die("Không thể xóa ");
-
-    $sql1.="delete from donvitinh where madonvitinh='".$ma."';";
-    // $kq_1 = $conn -> query($sql_1) or die("Không thể xóa ");
-
+// Kiểm tra nếu mã không rỗng
+if (empty($ma)) {
+    echo "Mã đơn vị tính không hợp lệ.";
+    exit;
 }
-else
-{
-    $sql1="delete from donvitinh where  madonvitinh='".$ma."'";
+
+// Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+$conn->begin_transaction();
+
+try {
+    // Kiểm tra xem có sản phẩm nào sử dụng đơn vị tính này không
+    $sql = "SELECT * FROM sanpham WHERE donvitinh = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $ma);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Nếu có sản phẩm sử dụng đơn vị tính này, xóa sản phẩm trước
+    if ($result->num_rows > 0) {
+        // Xóa các sản phẩm có đơn vị tính này
+        $sql1 = "DELETE FROM sanpham WHERE donvitinh = ?";
+        $stmt1 = $conn->prepare($sql1);
+        $stmt1->bind_param("s", $ma);
+        $stmt1->execute();
+    }
+
+    // Xóa đơn vị tính
+    $sql2 = "DELETE FROM donvitinh WHERE madonvitinh = ?";
+    $stmt2 = $conn->prepare($sql2);
+    $stmt2->bind_param("s", $ma);
+    $stmt2->execute();
+
+    // Commit transaction
+    $conn->commit();
+    
+    echo "<script language='javascript'>alert('Xóa thành công'); window.location.assign('donvitinh.php');</script>";
+} catch (Exception $e) {
+    // Rollback transaction nếu có lỗi xảy ra
+    $conn->rollback();
+    echo "Lỗi: " . htmlspecialchars($e->getMessage());
+} finally {
+    // Đóng các prepared statement
+    if (isset($stmt)) $stmt->close();
+    if (isset($stmt1)) $stmt1->close();
+    if (isset($stmt2)) $stmt2->close();
+    
+    // Đóng kết nối
+    $conn->close();
 }
-echo $sql1;
-$kq = $conn -> multi_query($sql1) or die("Không thể xóa ");
-echo ("<script language='javascript'>alert('Xóa thành công');window.location.assign('donvitinh.php');</script>");
 ?>

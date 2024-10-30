@@ -1,27 +1,28 @@
 <?php
-
-
-
 include("ketnoi.php");
 
-if(isset($_POST["Themth"]))
-{
-     $ma = $_POST["txtMaThuongHieu"];
+if(isset($_POST["Themth"])) {
+    
+    $ma = $_POST["txtMaThuongHieu"];
     $ten = $_POST["txtTenthuonghieu"];
-  
+    
+    
+    $sql = "INSERT INTO thuonghieu (MaThuongHieu, TenThuongHieu) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
 
+    
+    $stmt->bind_param("ss", $ma, $ten);
 
+    
+    if ($stmt->execute()) {
+        
+        echo "<script language='javascript'>alert('Thêm thành công'); window.location.assign('thuonghieu.php');</script>";
+    } else {
+        die("Không thể thêm thương hiệu: " . htmlspecialchars($conn->error));
+    }
 
-
-    $sql = "INSERT INTO thuonghieu ( MaThuongHieu, TenThuongHieu)
-            VALUES ('$ma','$ten')";
-
-    $kq = $conn->query($sql) or die("Không thể thêm thương hiệu: " . $conn->error);
-
-    echo("<script language='javascript'>alert('Thêm thành công');
-    window.location.assign('thuonghieu.php');
-    </script>");
-
+    
+    $stmt->close();
     $conn->close();
 } else {
     echo "Lỗi";

@@ -1,29 +1,28 @@
 <?php
-
-
-
 include("ketnoi.php");
 
-if(isset($_POST["Themloaisanpham"]))
-{
-     $ma = $_POST["txtmaloaisanpham"];
+if(isset($_POST["Themloaisanpham"])) {
+    
+    $ma = $_POST["txtmaloaisanpham"];
     $ten = $_POST["txttenloaisanpham"];
-  
+    
+    
+    $sql = "INSERT INTO loaisanpham (maloaisanpham, tenloaisanpham) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
 
+    
+    $stmt->bind_param("ss", $ma, $ten);
 
+    
+    if ($stmt->execute()) {
+        echo "<script language='javascript'>alert('" . htmlspecialchars('Thêm loại sản phẩm thành công') . "'); window.location.assign('loaisanpham.php');</script>";
+    } else {
+        echo "Không thể thêm loại sản phẩm: " . htmlspecialchars($conn->error);
+    }
 
-
-    $sql = "INSERT INTO loaisanpham ( maloaisanpham, tenloaisanpham)
-            VALUES ('$ma','$ten')";
-
-    $kq = $conn->query($sql) or die("Không thể thêm loại sản phẩm: " . $conn->error);
-
-    echo("<script language='javascript'>alert('Thêm loại sản phẩm thành công');
-    window.location.assign('loaisanpham.php');
-    </script>");
-
+    $stmt->close();
     $conn->close();
-} else {    
+} else {
     echo "Lỗi";
 }
 ?>

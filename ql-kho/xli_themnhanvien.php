@@ -1,16 +1,14 @@
 <?php
-
-
-
+session_start();
 include("ketnoi.php");
-
+if (!isset($_SESSION['role']) || ($_SESSION['role'] != 1 && $_SESSION['role'] != 2)) {
+    die("Bạn không có quyền truy cập chức năng này.");
+}
 if(isset($_POST["Themnhanvien"]))
 {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        echo $_POST['csrf_token'];
-
-        echo $_SESSION['csrf_token'];
-        echo $
+        echo $_POST['csrf_token'] . "<br>";
+        echo $_SESSION['csrf_token'] . "<br>";
         die("Yêu cầu không hợp lệ (CSRF token không hợp lệ).");
     }
     $ten = $_POST["txttennhanvien"];

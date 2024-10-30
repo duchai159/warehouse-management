@@ -116,18 +116,20 @@ include("ketnoi.php");
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-bag-shopping"></i></div>
                             Sản phẩm
                         </a>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 1): ?>
                         <a class="nav-link collapsed" href="nhanvien.php">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-user"></i></div>
                             Nhân viên
                         </a>
+                        <?php endif; ?>
                         <a class="nav-link collapsed" href="khohang.php">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-warehouse"></i></div>
                             Kho hàng
                         </a>
-                        <a class="nav-link collapsed" href="nhacungcap.php">
+                        <!-- <a class="nav-link collapsed" href="nhacungcap.php">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-house-user"></i></div>
                             Nhà cung cấp
-                        </a>
+                        </a> -->
                         <a class="nav-link collapsed" href="khachhang.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             Khách hàng
